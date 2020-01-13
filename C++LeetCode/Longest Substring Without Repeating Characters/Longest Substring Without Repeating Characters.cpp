@@ -1,6 +1,7 @@
 #include<iostream>
 #include<string>
 #include<unordered_set>
+#include<unordered_map>
 using namespace std;
 class Solution {
 public:
@@ -13,28 +14,35 @@ public:
 		{
 			return 1;
 		}
-		std::unordered_set<char> hashSet;
+		std::unordered_map<char,int> hashmap;
 		int maxLen = 1;
+		int start = 0;
 		for (int i = 0; i < s.size(); i++)
 		{
-			int start = i;
 			for (; start < s.size(); start++)
 			{
-				if (hashSet.find(s[start]) == hashSet.end())
+				auto iter = hashmap.find(s[start]);
+				if (iter == hashmap.end())
 				{
-					hashSet.emplace(s[start]);
+					hashmap.emplace(s[start], i);
 				}
 				else
 				{
-					if (hashSet.size() > maxLen)
+					if (hashmap.size() > maxLen)
 					{
-						maxLen = hashSet.size();
+						maxLen = hashmap.size();
 					}
-					hashSet.clear();
+					start = iter->second + 1;
+					hashmap.clear();
 					break;
 				}
 			}
 		}
+		if (hashmap.size() > maxLen)
+		{
+			maxLen = hashmap.size();
+		}
+		hashmap.clear();
 		return maxLen;
 	}
 };
