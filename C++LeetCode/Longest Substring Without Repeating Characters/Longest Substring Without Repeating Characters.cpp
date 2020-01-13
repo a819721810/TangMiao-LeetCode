@@ -14,40 +14,38 @@ public:
 		{
 			return 1;
 		}
-		std::unordered_map<char,int> hashmap;
-		int maxLen = 1;
-		int start = 0;
-		for (int i = 0; i < s.size(); i++)
+		std::unordered_set<char> hashset;
+		int start = 0, end = 0;
+		int maxLen = 0;
+		for (; end < s.size(); )
 		{
-			for (; start < s.size(); start++)
+			if (hashset.find(s[end])==hashset.end())
 			{
-				auto iter = hashmap.find(s[start]);
-				if (iter == hashmap.end())
+				hashset.emplace(s[end]);
+				end++;
+				//如果没有新增i是不需要前进的，只需要滑动窗口前面缩小就行了
+				//i++;
+				auto sLen = end - start;
+				if (sLen > maxLen)
 				{
-					hashmap.emplace(s[start], i);
-				}
-				else
-				{
-					if (hashmap.size() > maxLen)
-					{
-						maxLen = hashmap.size();
-					}
-					start = iter->second + 1;
-					hashmap.clear();
-					break;
+					maxLen = sLen;
 				}
 			}
+			else
+			{
+				
+				hashset.erase(s[start]);
+				start++;
+				
+			}
 		}
-		if (hashmap.size() > maxLen)
-		{
-			maxLen = hashmap.size();
-		}
-		hashmap.clear();
+		hashset.clear();
 		return maxLen;
 	}
 };
 void cinString(string &s)
 {
+	std::cout << "请输入要查找的无重复的最长子串的字符串" << std::endl;
 	cin >> s;
 }
 int main()
