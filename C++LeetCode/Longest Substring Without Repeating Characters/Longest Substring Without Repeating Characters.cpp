@@ -14,32 +14,54 @@ public:
 		{
 			return 1;
 		}
-		std::unordered_set<char> hashset;
+		std::unordered_map<char, int> hashmap;
 		int start = 0, end = 0;
 		int maxLen = 0;
 		for (; end < s.size(); )
 		{
-			if (hashset.find(s[end])==hashset.end())
+			auto iter = hashmap.find(s[end]);
+			//每次找到了并且找到的在start的前面，比如abcb,第4个b找到时应该更新start到c的位置
+			if (iter != hashmap.end() && iter->second >=start)
 			{
-				hashset.emplace(s[end]);
+				start = iter->second + 1;
+			}
+			//否则就一直添加
+			else
+			{
+				//这里不能用hashmap.emplace不然aaa这样的没法处理，
+				//每次查找都查找到第一个a，要改变下次查找a的位置
+				hashmap[s[end]] = end;
 				end++;
-				//如果没有新增i是不需要前进的，只需要滑动窗口前面缩小就行了
-				//i++;
 				auto sLen = end - start;
 				if (sLen > maxLen)
 				{
 					maxLen = sLen;
 				}
 			}
-			else
-			{
-				
-				hashset.erase(s[start]);
-				start++;
-				
-			}
+			//如果改成这种，那么aaa判断不来
+			//if (iter == hashmap.end()||iter->second<start)
+			//{
+			//	hashmap.emplace(s[end], end);
+			//	end++;
+			//	//如果没有新增i是不需要前进的，只需要滑动窗口前面缩小就行了
+			//	//i++;
+			//	auto sLen = end - start;
+			//	if (sLen > maxLen)
+			//	{
+			//		maxLen = sLen;
+			//	}
+			//}
+			//else
+			//{
+			//	if (hashmap[s[end]]>=start)
+			//	{
+			//		start = hashmap[s[end]] + 1;
+			//	}
+			//	/*auto it = iter++;
+			//	hashmap.erase(hashmap.begin(), iter);*/
+			//}
 		}
-		hashset.clear();
+		hashmap.clear();
 		return maxLen;
 	}
 };
