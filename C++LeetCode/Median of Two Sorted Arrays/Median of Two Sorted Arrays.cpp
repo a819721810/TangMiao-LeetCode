@@ -1,135 +1,38 @@
 #include<iostream>
 #include<vector>
 #include<set>
+#include<algorithm>
 using namespace std;
+
+int getKth(const vector<int>& nums1, int start1, int end1, const vector<int>& nums2, int start2, int end2, int K)
+{
+	int len1 = end1 - start1 + 1;
+	int len2 = end2 - start2 + 1;
+	//让 len1 的长度小于 len2，这样就能保证如果有数组空了，一定是 len1 
+	if (len1 > len2) return getKth(nums2, start2, end2, nums1, start1, end1, K);
+
+	if (len1 == 0) return nums2[start2 + K - 1];
+	if (K == 1) return std::min(nums1[start1], nums2[start2]);
+
+	int i = start1 + std::min(len1, K / 2) - 1;
+	int j = start2 + std::min(len2, K / 2) - 1;
+	if (nums1[i] > nums2[j]) {
+		return getKth(nums1, start1, end1, nums2, j + 1, end2, K - (j - start2 + 1));
+	}
+	else {
+		return getKth(nums1, i + 1, end1, nums2, start2, end2, K - (i - start1 + 1));
+	}
+}
+
+
 class Solution {
 public:
 	double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
-		int nums1Size = nums1.size();
-		int nums2Size = nums2.size();
-		int allSize = nums1Size + nums2Size;
-		int midNum = allSize / 2;
-		int count = 0;
-		bool isOddNumber = true;
-		int midFirst = 0, midSecond = 0;
-		if (allSize % 2 == 0)
-		{
-			isOddNumber = false;
-		}
-		int i = 0, j = 0;
-		while (i < nums1Size || j < nums2Size)
-		{
-			if (isOddNumber)
-			{
-				if (i < nums1Size && j < nums2Size)
-				{
-					if (nums1[i] > nums2[j])
-					{
-						if (count == midNum)
-						{
-							return nums2[j];
-						}
-						count++;
-						j++;
-					}
-					else
-					{
-						if (count == midNum)
-						{
-							return nums1[i];
-						}
-						count++;
-						i++;
-					}
-				}
-				else if (i < nums1Size)
-				{
-					if (count == midNum)
-					{
-						return nums1[i];
-					}
-					count++;
-					i++;
-				}
-				else
-				{
-					if (count == midNum)
-					{
-						return nums2[j];
-					}
-					count++;
-					j++;
-				}
-			}
-			//1 2 3 4 第一个target是4/2 -1 第二个是4/2
-			else
-			{
-				if (i < nums1Size && j < nums2Size)
-				{
-					if (nums1[i] > nums2[j])
-					{
-						if (count == midNum - 1)
-						{
-							/*return nums2[j];*/
-							midFirst = nums2[j];
-						}
-						else if (count == midNum)
-						{
-							midSecond = nums2[j];
-							return (midFirst + midSecond) / 2.0;
-						}
-						count++;
-						j++;
-					}
-					else
-					{
-						if (count == midNum - 1)
-						{
-							/*return nums2[j];*/
-							midFirst = nums1[i];
-						}
-						else if (count == midNum)
-						{
-							midSecond = nums1[i];
-							return (midFirst + midSecond) / 2.0;
-						}
-						count++;
-						i++;
-					}
-				}
-				else if (i < nums1Size)
-				{
-					if (count == midNum - 1)
-					{
-						/*return nums2[j];*/
-						midFirst = nums1[i];
-					}
-					else if (count == midNum)
-					{
-						midSecond = nums1[i];
-						return (midFirst + midSecond) / 2.0;
-					}
-					count++;
-					i++;
-				}
-				else
-				{
-					if (count == midNum-1)
-					{
-						midFirst = nums2[j];
-						//return nums2[j];
-					}
-					else if (count == midNum)
-					{
-						midSecond = nums2[j];
-						return (midFirst + midSecond) / 2.0;
-					}
-					count++;
-					j++;
-				}
-			}
-		}
-		return (midFirst + midSecond) / 2.0;
+		int n = nums1.size();
+		int m = nums2.size();
+		int left = (n + m + 1) / 2;
+		int right = (n + m + 2) / 2;
+		return (getKth(nums1, 0, n - 1, nums2, 0, m - 1, left) + getKth(nums1, 0, n - 1, nums2, 0, m - 1, right)) * 0.5;
 	}
 };
 
